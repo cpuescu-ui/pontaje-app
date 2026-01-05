@@ -1026,5 +1026,533 @@ def job_detail(job_id: int):
         <div class="card">
           <div class="card-body table-responsive">
             <table class="table table-striped align-middle" id="expTable">
-              <thead><tr><th>Data</th><th>Cat.</th><th>Descriere</th><th class="text-end">
+              <thead><tr><th>Data</th><th>Cat.</th><th>Descriere</th><th class="text-end">Cant</th><th>UM</th><th class="text-end">Cost</th><th class="text-end">Adaos</th><th>Fact</th><th class="text-end"></th></tr></thead>
+              <tbody>{exp_rows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
+      <!-- Plăți -->
+      <div class="tab-pane fade" id="tabPlati">
+        <div class="card mb-3">
+          <div class="card-body d-flex justify-content-between align-items-center gap-2">
+            <input class="form-control search-input" placeholder="Caută în plăți…" data-table-search="#payTable">
+            <button class="btn btn-dark no-print" data-bs-toggle="modal" data-bs-target="#modalPay"><i class="bi bi-plus-lg me-1"></i>Adaugă plată</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body table-responsive">
+            <table class="table table-striped align-middle" id="payTable">
+              <thead><tr><th>Data</th><th class="text-end">Suma</th><th>Metodă</th><th>Note</th><th class="text-end"></th></tr></thead>
+              <tbody>{pay_rows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Facturi -->
+      <div class="tab-pane fade" id="tabFacturi">
+        <div class="card mb-3">
+          <div class="card-body d-flex justify-content-between align-items-center gap-2">
+            <input class="form-control search-input" placeholder="Caută în facturi…" data-table-search="#invTable">
+            <button class="btn btn-success no-print" data-bs-toggle="modal" data-bs-target="#modalInv"><i class="bi bi-receipt me-1"></i>Generează factură</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-body table-responsive">
+            <table class="table table-striped align-middle" id="invTable">
+              <thead><tr><th>Nr</th><th>Emitere</th><th>Scadență</th><th>Plată</th><th class="text-end"></th></tr></thead>
+              <tbody>{inv_rows}</tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL Pontaj -->
+    <div class="modal fade no-print" id="modalPontaj" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form class="modal-content" method="post" action="{url_for('add_time', job_id=job_id)}">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-clock me-2"></i>Adaugă pontaj</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-4 mb-2"><label class="form-label">Data</label><input name="work_date" class="form-control" value="{date.today().isoformat()}"></div>
+              <div class="col-md-4 mb-2"><label class="form-label">Muncitor</label><input name="worker" class="form-control"></div>
+              <div class="col-md-4 mb-2"><label class="form-label">Ore *</label><input name="hours" class="form-control" inputmode="decimal" data-decimal required placeholder="ex: 5,5"></div>
+            </div>
+            <div class="mb-2"><label class="form-label">Activitate</label><input name="task" class="form-control"></div>
+            <div class="mb-2"><label class="form-label">Tarif override (opțional)</label><input name="rate_override" class="form-control" inputmode="decimal" data-decimal placeholder="ex: 180,00"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-light" data-bs-dismiss="modal">Renunță</button>
+            <button class="btn btn-dark">Salvează</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL Material -->
+    <div class="modal fade no-print" id="modalExp" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form class="modal-content" method="post" action="{url_for('add_exp', job_id=job_id)}">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-box-seam me-2"></i>Adaugă material/cheltuială</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-4 mb-2"><label class="form-label">Data</label><input name="exp_date" class="form-control" value="{date.today().isoformat()}"></div>
+              <div class="col-md-4 mb-2"><label class="form-label">Categorie</label><input name="category" class="form-control" value="MATERIAL"></div>
+              <div class="col-md-4 mb-2"><label class="form-label">Facturabil</label>
+                <select name="billable" class="form-select">
+                  <option value="1" selected>Da</option>
+                  <option value="0">Nu</option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-2"><label class="form-label">Descriere *</label><input name="description" class="form-control" required></div>
+            <div class="row">
+              <div class="col-md-3 mb-2"><label class="form-label">Cant</label><input name="qty" class="form-control" inputmode="decimal" data-decimal value="1"></div>
+              <div class="col-md-3 mb-2"><label class="form-label">UM</label><input name="unit" class="form-control" value="buc"></div>
+              <div class="col-md-3 mb-2"><label class="form-label">Cost/unit *</label><input name="unit_cost" class="form-control" inputmode="decimal" data-decimal required placeholder="ex: 12,50"></div>
+              <div class="col-md-3 mb-2"><label class="form-label">Adaos %</label><input name="markup_percent" class="form-control" inputmode="decimal" data-decimal value="0"></div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-light" data-bs-dismiss="modal">Renunță</button>
+            <button class="btn btn-dark">Salvează</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL Plată -->
+    <div class="modal fade no-print" id="modalPay" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered">
+        <form class="modal-content" method="post" action="{url_for('add_pay', job_id=job_id)}">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-cash-coin me-2"></i>Adaugă plată</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="mb-2"><label class="form-label">Data</label><input name="pay_date" class="form-control" value="{date.today().isoformat()}"></div>
+            <div class="mb-2"><label class="form-label">Sumă *</label><input name="amount" class="form-control" inputmode="decimal" data-decimal required placeholder="ex: 100,50"></div>
+            <div class="mb-2"><label class="form-label">Metodă</label><input name="method" class="form-control" placeholder="Cash / OP / Card"></div>
+            <div class="mb-2"><label class="form-label">Note</label><input name="notes" class="form-control"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-light" data-bs-dismiss="modal">Renunță</button>
+            <button class="btn btn-dark">Salvează</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- MODAL Factură -->
+    <div class="modal fade no-print" id="modalInv" tabindex="-1">
+      <div class="modal-dialog modal-dialog-centered modal-lg">
+        <form class="modal-content" method="post" action="{url_for('invoice_generate', job_id=job_id)}">
+          <div class="modal-header">
+            <h5 class="modal-title"><i class="bi bi-receipt me-2"></i>Generează factură fiscală</h5>
+            <button class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body">
+            <div class="row">
+              <div class="col-md-6 mb-2"><label class="form-label">Data emiterii</label><input name="issue_date" class="form-control" value="{date.today().isoformat()}"></div>
+              <div class="col-md-6 mb-2"><label class="form-label">Scadență</label><input name="due_date" class="form-control" placeholder="YYYY-MM-DD"></div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-2">
+                <label class="form-label">Metodă plată</label>
+                <select name="payment_method" class="form-select">
+                  <option value="OP" selected>OP</option>
+                  <option value="Cash">Cash</option>
+                  <option value="Card">Card</option>
+                </select>
+              </div>
+              <div class="col-md-6 mb-2"><label class="form-label">Loc emitere</label><input name="place" class="form-control" placeholder="ex: București"></div>
+            </div>
+            <div class="mb-2"><label class="form-label">Note</label><input name="notes" class="form-control" placeholder="Conform deviz / contract..."></div>
+            <div class="small text-muted">Liniile se generează din manoperă + cheltuieli facturabile.</div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-light" data-bs-dismiss="modal">Renunță</button>
+            <button class="btn btn-success">Generează</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    """
+    return render_page(body, f"{APP_TITLE} — {job.title}")
+
+
+@app.get("/job/<int:job_id>/toggle")
+@login_required
+def toggle_job(job_id: int):
+    job = Job.query.get_or_404(job_id)
+    job.status = "CLOSED" if job.status == "OPEN" else "OPEN"
+    db.session.commit()
+    flash(f"Status schimbat: {job.status}")
+    return redirect(url_for("job_detail", job_id=job_id))
+
+
+# ----------------- CRUD: Time/Expense/Payment -----------------
+
+@app.post("/job/<int:job_id>/add-time")
+@login_required
+def add_time(job_id: int):
+    Job.query.get_or_404(job_id)
+    hours = d(request.form.get("hours", "0"))
+    if hours <= 0:
+        flash("Ore invalide. Exemplu: 5,5")
+        return redirect(url_for("job_detail", job_id=job_id))
+    ro = request.form.get("rate_override", "").strip()
+    t = Timesheet(
+        job_id=job_id,
+        work_date=request.form.get("work_date", date.today().isoformat()).strip(),
+        worker=request.form.get("worker", "").strip() or None,
+        task=request.form.get("task", "").strip() or None,
+        hours=hours,
+        rate_override=d(ro) if ro else None,
+    )
+    db.session.add(t)
+    db.session.commit()
+    flash("Pontaj adăugat.")
+    return redirect(url_for("job_detail", job_id=job_id))
+
+
+@app.get("/job/<int:job_id>/delete-time/<int:ts_id>")
+@login_required
+def delete_time(job_id: int, ts_id: int):
+    Timesheet.query.filter_by(id=ts_id, job_id=job_id).delete()
+    db.session.commit()
+    flash("Pontaj șters.")
+    return redirect(url_for("job_detail", job_id=job_id))
+
+
+@app.post("/job/<int:job_id>/add-exp")
+@login_required
+def add_exp(job_id: int):
+    Job.query.get_or_404(job_id)
+    unit_cost = d(request.form.get("unit_cost", "0"))
+    qty = d(request.form.get("qty", "1"))
+    if qty <= 0 or unit_cost < 0:
+        flash("Cantitate/cost invalid.")
+        return redirect(url_for("job_detail", job_id=job_id))
+
+    e = Expense(
+        job_id=job_id,
+        exp_date=request.form.get("exp_date", date.today().isoformat()).strip(),
+        category=request.form.get("category", "MATERIAL").strip() or None,
+        description=request.form.get("description", "").strip(),
+        qty=qty,
+        unit=request.form.get("unit", "buc").strip() or "buc",
+        unit_cost=unit_cost,
+        markup_percent=d(request.form.get("markup_percent", "0")),
+        billable=(request.form.get("billable", "1") == "1"),
+    )
+    db.session.add(e)
+    db.session.commit()
+    flash("Material/cheltuială adăugată.")
+    return redirect(url_for("job_detail", job_id=job_id))
+
+
+@app.get("/job/<int:job_id>/delete-exp/<int:exp_id>")
+@login_required
+def delete_exp(job_id: int, exp_id: int):
+    Expense.query.filter_by(id=exp_id, job_id=job_id).delete()
+    db.session.commit()
+    flash("Cheltuială ștearsă.")
+    return redirect(url_for("job_detail", job_id=job_id))
+
+
+@app.post("/job/<int:job_id>/add-pay")
+@login_required
+def add_pay(job_id: int):
+    Job.query.get_or_404(job_id)
+    amt = d(request.form.get("amount", "0"))
+    if amt <= 0:
+        flash("Suma introdusă nu este validă. Exemplu: 100,50")
+        return redirect(url_for("job_detail", job_id=job_id))
+
+    p = Payment(
+        job_id=job_id,
+        pay_date=request.form.get("pay_date", date.today().isoformat()).strip(),
+        amount=amt,
+        method=request.form.get("method", "").strip() or None,
+        notes=request.form.get("notes", "").strip() or None,
+    )
+    db.session.add(p)
+    db.session.commit()
+    flash("Plată adăugată.")
+    return redirect(url_for("job_detail", job_id=job_id))
+
+
+@app.get("/job/<int:job_id>/delete-pay/<int:pay_id>")
+@login_required
+def delete_pay(job_id: int, pay_id: int):
+    Payment.query.filter_by(id=pay_id, job_id=job_id).delete()
+    db.session.commit()
+    flash("Plată ștearsă.")
+    return redirect(url_for("job_detail", job_id=job_id))
+
+
+# ----------------- Receivables -----------------
+
+@app.get("/receivables")
+@login_required
+def receivables():
+    jobs = Job.query.order_by(Job.id.desc()).all()
+    tr = ""
+    total_all = Decimal("0")
+    cur = "RON"
+    for j in jobs:
+        t = compute_job_totals(j)
+        total_all += t["receivable"]
+        cur = j.currency
+        tr += f"""
+        <tr>
+          <td class="mono">{j.id}</td>
+          <td><a href="{url_for('job_detail', job_id=j.id)}">{j.title}</a><div class="text-muted small">{j.client.name}</div></td>
+          <td>{j.status}</td>
+          <td class="text-end">{money(t["total"])} {cur}</td>
+          <td class="text-end">{money(t["paid"])} {cur}</td>
+          <td class="text-end"><b class="text-danger">{money(t["receivable"])} {cur}</b></td>
+        </tr>
+        """
+
+    body = f"""
+    <div class="d-flex align-items-center justify-content-between mb-3">
+      <div>
+        <h2 class="mb-0">De încasat</h2>
+        <div class="text-muted">Situație pe toate lucrările</div>
+      </div>
+      <div class="h4 mb-0">Total: <span class="text-danger">{money(total_all)} {cur}</span></div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-body">
+        <input class="form-control search-input" placeholder="Caută lucrare/client…" data-table-search="#recTable">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body table-responsive">
+        <table class="table table-striped align-middle" id="recTable">
+          <thead><tr><th>ID</th><th>Lucrare</th><th>Status</th><th class="text-end">Total</th><th class="text-end">Plătit</th><th class="text-end">De încasat</th></tr></thead>
+          <tbody>{tr or "<tr><td colspan='6' class='text-muted'>Nimic.</td></tr>"}</tbody>
+        </table>
+      </div>
+    </div>
+    """
+    return render_page(body, f"{APP_TITLE} — De încasat")
+
+
+# ----------------- Invoice generation & view -----------------
+
+@app.post("/job/<int:job_id>/invoice/generate")
+@login_required
+def invoice_generate(job_id: int):
+    job = Job.query.get_or_404(job_id)
+    cp = ensure_company_profile()
+
+    series = (cp.invoice_series or "AA").strip()
+    number = next_invoice_number(series)
+    inv_no = make_inv_no(series, number)
+
+    issue_date = request.form.get("issue_date", date.today().isoformat()).strip()
+    due_date = request.form.get("due_date", "").strip() or None
+    payment_method = request.form.get("payment_method", "OP").strip() or "OP"
+    place = request.form.get("place", "").strip() or ""
+    notes = request.form.get("notes", "").strip() or ""
+
+    inv = Invoice(
+        job_id=job_id,
+        series=series,
+        number=number,
+        inv_no=inv_no,
+        issue_date=issue_date,
+        due_date=due_date,
+        payment_method=payment_method,
+        place=place,
+        notes=notes,
+    )
+    db.session.add(inv)
+    db.session.flush()
+
+    totals = compute_job_totals(job)
+
+    # Linie manoperă
+    if totals["labor_total"] > 0:
+        hours = totals["labor_hours"] if totals["labor_hours"] > 0 else Decimal("0")
+        unit_price = (totals["labor_total"] / hours) if hours > 0 else totals["labor_total"]
+        db.session.add(
+            InvoiceLine(
+                invoice_id=inv.id,
+                line_type="LABOR",
+                description="Manoperă (ore lucrate)",
+                qty=hours,
+                unit="ore",
+                unit_price=unit_price,
+                line_total=totals["labor_total"],
+            )
+        )
+
+    # Linii cheltuieli facturabile
+    exps = Expense.query.filter_by(job_id=job_id).all()
+    for e in exps:
+        if not e.billable:
+            continue
+        unit_price = d(e.unit_cost) * (Decimal("1") + d(e.markup_percent) / Decimal("100"))
+        line_total = d(e.qty) * unit_price
+        db.session.add(
+            InvoiceLine(
+                invoice_id=inv.id,
+                line_type="EXPENSE",
+                description=e.description,
+                qty=d(e.qty),
+                unit=e.unit,
+                unit_price=unit_price,
+                line_total=line_total,
+            )
+        )
+
+    db.session.commit()
+    flash(f"Factură generată: {inv_no}")
+    return redirect(url_for("invoice_view", invoice_id=inv.id))
+
+
+@app.get("/invoice/<int:invoice_id>")
+@login_required
+def invoice_view(invoice_id: int):
+    inv = Invoice.query.get_or_404(invoice_id)
+    job = Job.query.get_or_404(inv.job_id)
+    client = job.client
+    cp = ensure_company_profile()
+
+    lines = InvoiceLine.query.filter_by(invoice_id=invoice_id).all()
+    subtotal = sum([d(l.line_total) for l in lines], Decimal("0"))
+
+    vat_rate = d(job.vat_rate) if cp.vat_payer else Decimal("0")
+    vat = subtotal * vat_rate
+    total = subtotal + vat
+
+    rows = ""
+    i = 1
+    for l in lines:
+        rows += f"""
+        <tr>
+          <td class="text-muted">{i}</td>
+          <td>{l.description}</td>
+          <td class="text-end">{money(d(l.qty))}</td>
+          <td>{l.unit}</td>
+          <td class="text-end">{money(d(l.unit_price))}</td>
+          <td class="text-end">{money(d(l.line_total))}</td>
+        </tr>
+        """
+        i += 1
+
+    vat_label = pct(vat_rate) if cp.vat_payer else "NEPLĂTITOR TVA"
+
+    body = f"""
+    <div class="no-print d-flex justify-content-between align-items-center mb-3">
+      <a class="btn btn-outline-dark" href="{url_for('job_detail', job_id=job.id)}"><i class="bi bi-arrow-left me-1"></i>Înapoi</a>
+      <button class="btn btn-dark" onclick="window.print()"><i class="bi bi-printer me-1"></i>Print / Save PDF</button>
+    </div>
+
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <div class="d-flex align-items-center gap-2">
+              <img src="{url_for('static', filename='logo.png')}" onerror="this.style.display='none'" alt="Logo" height="40">
+              <h3 class="mb-0">FACTURĂ FISCALĂ</h3>
+            </div>
+            <div class="text-muted mt-1">Serie: <span class="mono">{inv.series}</span> · Număr: <span class="mono">{inv.number}</span></div>
+            <div class="text-muted">Nr complet: <span class="mono">{inv.inv_no}</span></div>
+            <div class="text-muted">Data emiterii: {inv.issue_date}</div>
+            <div class="text-muted">Scadență: {inv.due_date or "-"}</div>
+            <div class="text-muted">Metodă plată: {inv.payment_method}</div>
+            <div class="text-muted">Loc emitere: {inv.place or "-"}</div>
+          </div>
+          <div class="text-end">
+            <div class="fw-bold">{job.currency}</div>
+            <div class="text-muted">TVA: {vat_label}</div>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="fw-bold mb-1">Furnizor</div>
+            <div>{cp.name}</div>
+            <div class="small text-muted">CUI: {cp.cui or "-"} · Reg. Com.: {cp.reg_com or "-"}</div>
+            <div class="small text-muted">{cp.address or ""}</div>
+            <div class="small text-muted">{cp.phone or ""} {cp.email or ""}</div>
+            <div class="small text-muted">IBAN: {cp.iban or "-"} · Bancă: {cp.bank or "-"}</div>
+            <div class="small text-muted">Capital social: {cp.capital_social or "-"}</div>
+          </div>
+
+          <div class="col-md-6 text-end">
+            <div class="fw-bold mb-1">Cumpărător</div>
+            <div>{client.name}</div>
+            <div class="small text-muted">CUI: {client.cui or "-"} · Reg. Com.: {client.reg_com or "-"}</div>
+            <div class="small text-muted">{client.address or ""}</div>
+            <div class="small text-muted">{client.phone or ""} {client.email or ""}</div>
+            <div class="small text-muted">Contact: {client.contact or "-"}</div>
+          </div>
+        </div>
+
+        <hr/>
+
+        <div class="table-responsive">
+          <table class="table table-sm">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Descriere</th>
+                <th class="text-end">Cant</th>
+                <th>UM</th>
+                <th class="text-end">Preț (fără TVA)</th>
+                <th class="text-end">Valoare (fără TVA)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows or "<tr><td colspan='6' class='text-muted'>Nicio linie.</td></tr>"}
+            </tbody>
+          </table>
+        </div>
+
+        <div class="row mt-3">
+          <div class="col-md-6">
+            <div class="small text-muted">{inv.notes or ""}</div>
+            <div class="small text-muted">{cp.footer_notes or ""}</div>
+          </div>
+          <div class="col-md-6">
+            <table class="table table-sm">
+              <tr><td class="text-end">Subtotal (fără TVA)</td><td class="text-end">{money(subtotal)} {job.currency}</td></tr>
+              <tr><td class="text-end">TVA ({vat_label})</td><td class="text-end">{money(vat)} {job.currency}</td></tr>
+              <tr class="fw-bold"><td class="text-end">TOTAL</td><td class="text-end">{money(total)} {job.currency}</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="row mt-4">
+          <div class="col-6"><div class="small text-muted">Semnătură furnizor: ____________________</div></div>
+          <div class="col-6 text-end"><div class="small text-muted">Semnătură client: ____________________</div></div>
+        </div>
+      </div>
+    </div>
+    """
+    return render_page(body, f"Factura {inv.inv_no}")
+
+
+# ----------------- Run local -----------------
+
+if __name__ == "__main__":
+    app.run(host="127.0.0.1", port=5000, debug=True)
